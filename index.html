@@ -207,7 +207,7 @@ function order(){
   const price=sp.n900*u.u900 + sp.n485*u.u485;
   let parts=[];
   if(sp.n900) parts.push('комплект модулей 900 мм — '+sp.n900+' шт × '+fmt(u.u900)+CFG.currency);
-  parts.push('модуль 485 мм — '+sp.n485+' шт × '+fmt(u.u485)+CFG.currency);
+  parts.push('комплект модулей 485 мм — '+sp.n485+' шт × '+fmt(u.u485)+CFG.currency);
   let breakText=parts.join('; ');
   if(color==='beige') breakText+='; бежевый +15%';
   return {sp,u,price,breakText};
