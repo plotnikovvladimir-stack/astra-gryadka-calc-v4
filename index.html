@@ -73,6 +73,12 @@
     .card{grid-template-columns:1fr;gap:18px;align-items:start;}
     .stage{aspect-ratio:4/3;max-height:56vh;}          /* длинные грядки — заполнение кадра, как раньше */
     .stage.sq{aspect-ratio:1/1;max-height:none;}       /* грядка 1 (куб) — квадратный кадр под квадратный рендер */
+    /* Мобильный: блок «ИНСТРУКЦИИ» уходит вниз, под кнопку «В корзину» (справочная зона).
+       Так картинка грядки и параметры (цвет/размер) ближе друг к другу — при смене
+       параметров результат виден без пролистывания. На ПК порядок не меняется. */
+    .info{display:flex;flex-direction:column;}
+    .docs{order:99;margin:18px 0 0;}
+
     .doc-ic{width:38px;height:38px;border-radius:10px;}   /* инструкции видимы и на мобайле; тап-таргет крупнее */
     .doc-ic svg{width:19px;height:19px;}
     .price-val{font-size:26px;}
