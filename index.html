@@ -166,7 +166,9 @@ const CFG={
   weightModule485: 9.2,   // вес модуля 485 мм (2 секции), кг (2×4.6, как v1)
   configAnchor:   '#astra-configs',  // якорь блока с конфигурациями ниже на странице Tilda
   videoAnchor:    '#astra-video',    // якорь блока с ВИДЕО-инструкцией ниже на странице Tilda
-  pdfUrl:         '',                // ссылка на PDF-инструкцию по монтажу (откроется в новой вкладке); пусто → «скоро»
+  videoEnabled:   false,             // ВРЕМЕННО: кнопка «Видео» скрыта (видео-инструкция готовится).
+                                     // Вернуть: поставить true (иконка, тултип, обработчик и videoAnchor сохранены).
+  pdfUrl:         'https://disk.yandex.ru/i/p5HK_PCmAOg3gw',  // PDF-инструкция по монтажу (откроется в новой вкладке); пусто → «скоро»
   // Корзина (см. INSTALL_TILDA.md): картинка товара берётся по URL (не base64) с GitHub Pages,
   // добавление в корзину идёт через postMessage к родительской странице Tilda.
   imgBase:        'https://plotnikovvladimir-stack.github.io/astra-gryadka-calc-v4/img/', // <цвет>/<n>.webp — ОТДЕЛЬНЫЙ репо v4
@@ -275,6 +277,9 @@ document.getElementById('cartBtn').onclick=addToCart;
 function goAnchor(a){const t=document.querySelector(a);if(t)t.scrollIntoView({behavior:'smooth'});else if(inIframe())window.parent.postMessage({type:'astra:scrollTo',anchor:a},'*');else location.hash=a;}
 document.getElementById('cfgLink').onclick=function(){goAnchor(CFG.configAnchor);};
 document.getElementById('actVideo').onclick=function(e){e.preventDefault();goAnchor(CFG.videoAnchor);};
+// Кнопка «Видео» временно скрыта (CFG.videoEnabled=false). Разметка/стили/обработчик/якорь остаются в коде —
+// чтобы вернуть, достаточно CFG.videoEnabled=true (и актуальный CFG.videoAnchor на странице Tilda).
+if(!CFG.videoEnabled){var _v=document.getElementById('actVideo'); if(_v) _v.style.display='none';}
 (function(){var a=document.getElementById('actPdf');if(CFG.pdfUrl){a.href=CFG.pdfUrl;}else{a.href='#';a.onclick=function(e){e.preventDefault();alert('PDF-инструкция по монтажу скоро будет подключена');};}})();
 imgs[0].onload=reportHeight;
 imgs[0].src=imgUrl(color,N); update();
