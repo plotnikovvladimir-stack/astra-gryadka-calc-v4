@@ -178,7 +178,7 @@ const CFG={
   // Корзина (см. INSTALL_TILDA.md): картинка товара берётся по URL (не base64) с GitHub Pages,
   // добавление в корзину идёт через postMessage к родительской странице Tilda.
   imgBase:        'https://plotnikovvladimir-stack.github.io/astra-gryadka-calc-v4/img/', // <цвет>/<n>.webp — ОТДЕЛЬНЫЙ репо v4
-  productUrl:     'https://zking.ru/gryadka-test/'  // ссылка на товар v4 (заменить на боевую страницу v4)
+  productUrl:     'https://zking.ru/product/modulnaya-gryadka-astra-polovina/'  // ссылка на товар v4 (заменить на боевую страницу v4)
 };
 /* ========================================================================== */
 function imgUrl(c,n){return CFG.imgBase+c+'/'+n+'.webp';}
@@ -281,7 +281,11 @@ const sw=document.getElementById('sw');
 COLORS.forEach(c=>{const b=document.createElement('button');b.className='sw';b.dataset.c=c.key;b.style.background=c.sw;b.title=c.name;b.setAttribute('aria-label',c.name);b.onclick=()=>{color=c.key;update();};sw.appendChild(b);});
 document.getElementById('cartBtn').onclick=addToCart;
 function goAnchor(a){const t=document.querySelector(a);if(t)t.scrollIntoView({behavior:'smooth'});else if(inIframe())window.parent.postMessage({type:'astra:scrollTo',anchor:a},'*');else location.hash=a;}
-document.getElementById('cfgLink').onclick=function(){goAnchor(CFG.configAnchor);};
+// Ссылка «Другие конфигурации» — нативный переход родителя к якорю на странице товара Tilda.
+// href = страница товара + #configuration, target=_parent (калькулятор — cross-origin iframe,
+// поэтому нужен полный URL и _parent). Если посетитель уже на этой странице — просто плавный скролл
+// к <a name="configuration"> без перезагрузки. (Мост astra:scrollTo больше для этого не нужен.)
+(function(){var l=document.getElementById('cfgLink');l.href=(CFG.productUrl||'').split('#')[0]+CFG.configAnchor;l.target='_parent';l.rel='noopener';})();
 document.getElementById('actVideo').onclick=function(e){e.preventDefault();goAnchor(CFG.videoAnchor);};
 // Кнопка «Видео» временно скрыта (CFG.videoEnabled=false). Разметка/стили/обработчик/якорь остаются в коде —
 // чтобы вернуть, достаточно CFG.videoEnabled=true (и актуальный CFG.videoAnchor на странице Tilda).
