@@ -35,6 +35,8 @@
   .doc-ic:hover{background:var(--green);transform:translateY(-1px);}
   .doc-ic svg{width:17px;height:17px;display:block;fill:none;stroke:var(--green);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s;}
   .doc-ic:hover svg{stroke:#fff;}
+  .doc-ic .ic-tools{display:none;fill:var(--green);stroke:none;}
+  .doc-ic:hover .ic-tools{fill:#fff;}
   .lab{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 8px;font-weight:600;}
   .opts{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;}
   .opts.sws{display:flex;flex-wrap:wrap;gap:10px;}
@@ -76,10 +78,13 @@
     /* Мобильный: блок «ИНСТРУКЦИИ» уходит вниз, под кнопку «В корзину» (справочная зона).
        Так картинка грядки и параметры (цвет/размер) ближе друг к другу — при смене
        параметров результат виден без пролистывания. На ПК порядок не меняется. */
-    .info{display:flex;flex-direction:column;}
-    .docs{order:99;margin:18px 0 0;}
+    /* Мобильный: инструкция — иконкой у уровня «ЦВЕТ», прижата вправо, без подписи (значок сборки). */
+    .docs{margin:0;height:0;overflow:visible;position:relative;}
+    .docs-lb{display:none;}
+    .docs-row{position:absolute;right:0;top:16px;}
+    .doc-ic .ic-doc{display:none;} .doc-ic .ic-tools{display:block;}
 
-    .doc-ic{width:38px;height:38px;border-radius:10px;}   /* инструкции видимы и на мобайле; тап-таргет крупнее */
+    .doc-ic{width:36px;height:36px;border-radius:10px;}
     .doc-ic svg{width:19px;height:19px;}
     .price-val{font-size:26px;}
     .feat{padding:20px 18px;margin-top:20px;}
@@ -105,7 +110,7 @@
     <div class="docs">
       <span class="docs-lb">Инструкции</span>
       <div class="docs-row">
-        <a class="doc-ic" id="actPdf" title="Инструкция по монтажу (PDF)" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M18 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8l6 6v10a2 2 0 0 1-2 2z"/><path d="M9 13h6M9 17h4"/></svg></a>
+        <a class="doc-ic" id="actPdf" title="Инструкция по монтажу (PDF)" target="_blank" rel="noopener"><svg class="ic-doc" viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M18 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8l6 6v10a2 2 0 0 1-2 2z"/><path d="M9 13h6M9 17h4"/></svg><svg class="ic-tools" viewBox="0 0 16 16"><path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3q0-.405-.102-.777l-2.14 2.141L12 4l-.365-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814z"/></svg></a>
         <a class="doc-ic" id="actVideo" title="Видео-инструкция монтажа"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M11 9.4l4.2 2.6-4.2 2.6z"/></svg></a>
       </div>
     </div>
