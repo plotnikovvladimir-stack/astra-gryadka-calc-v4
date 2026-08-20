@@ -111,7 +111,7 @@
       <span class="docs-lb">Инструкции</span>
       <div class="docs-row">
         <a class="doc-ic" id="actPdf" title="Инструкция по монтажу (PDF)" target="_blank" rel="noopener"><svg class="ic-doc" viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M18 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8l6 6v10a2 2 0 0 1-2 2z"/><path d="M9 13h6M9 17h4"/></svg><svg class="ic-tools" viewBox="0 0 16 16"><path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3q0-.405-.102-.777l-2.14 2.141L12 4l-.365-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814z"/></svg></a>
-        <a class="doc-ic" id="actVideo" title="Видео-инструкция монтажа" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M11 9.4l4.2 2.6-4.2 2.6z"/></svg></a>
+        <a class="doc-ic" id="actVideo" title="Видео-инструкция монтажа"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M11 9.4l4.2 2.6-4.2 2.6z"/></svg></a>
       </div>
     </div>
     <div class="lab">Цвет</div>
@@ -177,9 +177,8 @@ const CFG={
   weightModule485: 9.2,   // вес модуля 485 мм (2 секции), кг (2×4.6, как v1)
   configAnchor:   '#configuration',  // якорь блока с конфигурациями ниже на странице Tilda
   videoAnchor:    '#astra-video',    // якорь блока с ВИДЕО-инструкцией ниже на странице Tilda
-  videoUrl:       'https://disk.yandex.ru/i/Z2teWa-V5vd7nA', // видео-инструкция монтажа (Яндекс.Диск, новая вкладка)
-  videoEnabled:   true,              // кнопка «Видео» показана; ведёт на CFG.videoUrl (или к videoAnchor, если пусто)
-                                     // (ранее скрыто флагом; теперь включено — иконка ведёт на CFG.videoUrl в новой вкладке)
+  videoEnabled:   false,             // ВРЕМЕННО: кнопка «Видео» скрыта (видео-инструкция готовится).
+                                     // Вернуть: поставить true (иконка, тултип, обработчик и videoAnchor сохранены).
   pdfUrl:         'https://disk.yandex.ru/i/p5HK_PCmAOg3gw',  // PDF-инструкция по монтажу (откроется в новой вкладке); пусто → «скоро»
   // Корзина (см. INSTALL_TILDA.md): картинка товара берётся по URL (не base64) с GitHub Pages,
   // добавление в корзину идёт через postMessage к родительской странице Tilda.
@@ -199,7 +198,17 @@ const COLORS=[
   {key:'red',  name:'Красный',   sw:'#9B3D2E'}
 ];
 const _p=new URLSearchParams(location.search);
-let N=Math.max(1,Math.min(6,+_p.get('n')||1)), color=_p.get('c')||'brown', front=true;
+// Стартовая конфигурация: ?config=<цвет>_<размер> (напр. gray_2). Fallback — прежние ?c= / ?n=.
+const _CK=COLORS.map(c=>c.key);
+function _parseConfig(){
+  let c=_p.get('c'), n=+_p.get('n');
+  const cfg=_p.get('config');
+  if(cfg){const m=/^([a-z]+)_(\d+)$/i.exec(cfg.trim());if(m){c=m[1].toLowerCase();n=+m[2];}}
+  if(_CK.indexOf(c)<0) c='brown';
+  return {c:c, n:Math.max(1,Math.min(6,n||1))};
+}
+const _ic=_parseConfig();
+let N=_ic.n, color=_ic.c, front=true;
 const imgs=[document.getElementById('imgA'),document.getElementById('imgB')];
 function fmt(x){return String(Math.round(x)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');}
 function colorName(){const c=COLORS.find(x=>x.key===color);return c?c.name:color;}
@@ -280,11 +289,17 @@ function reportHeight(){
   const h=Math.ceil(document.documentElement.scrollHeight);
   if(h && h!==_lastH){_lastH=h; window.parent.postMessage({type:'astra:height',height:h},'*');}
 }
+/* ---- Синхронизация выбранной конфигурации в URL (свой + через мост в адрес страницы Tilda) ---- */
+function syncConfig(){
+  const cfg=color+'_'+N;
+  try{const u=new URL(location.href);u.searchParams.set('config',cfg);u.searchParams.delete('c');u.searchParams.delete('n');history.replaceState(null,'',u);}catch(e){}
+  if(inIframe()) window.parent.postMessage({type:'astra:config',config:cfg,c:color,n:N},'*');
+}
 /* ---- Инициализация UI ---- */
 const chips=document.getElementById('chips');
-for(let k=1;k<=6;k++){const b=document.createElement('button');b.className='chip';b.dataset.n=k;b.textContent=k;b.onclick=()=>{N=k;update();};chips.appendChild(b);}
+for(let k=1;k<=6;k++){const b=document.createElement('button');b.className='chip';b.dataset.n=k;b.textContent=k;b.onclick=()=>{N=k;update();syncConfig();};chips.appendChild(b);}
 const sw=document.getElementById('sw');
-COLORS.forEach(c=>{const b=document.createElement('button');b.className='sw';b.dataset.c=c.key;b.style.background=c.sw;b.title=c.name;b.setAttribute('aria-label',c.name);b.onclick=()=>{color=c.key;update();};sw.appendChild(b);});
+COLORS.forEach(c=>{const b=document.createElement('button');b.className='sw';b.dataset.c=c.key;b.style.background=c.sw;b.title=c.name;b.setAttribute('aria-label',c.name);b.onclick=()=>{color=c.key;update();syncConfig();};sw.appendChild(b);});
 document.getElementById('cartBtn').onclick=addToCart;
 function goAnchor(a){const t=document.querySelector(a);if(t)t.scrollIntoView({behavior:'smooth'});else if(inIframe())window.parent.postMessage({type:'astra:scrollTo',anchor:a},'*');else location.hash=a;}
 // Ссылка «Другие конфигурации» — нативный переход родителя к якорю на странице товара Tilda.
@@ -292,7 +307,7 @@ function goAnchor(a){const t=document.querySelector(a);if(t)t.scrollIntoView({be
 // поэтому нужен полный URL и _parent). Если посетитель уже на этой странице — просто плавный скролл
 // к <a name="configuration"> без перезагрузки. (Мост astra:scrollTo больше для этого не нужен.)
 (function(){var l=document.getElementById('cfgLink');l.href=(CFG.productUrl||'').split('#')[0]+CFG.configAnchor;l.target='_parent';l.rel='noopener';})();
-(function(){var a=document.getElementById('actVideo');if(CFG.videoUrl){a.href=CFG.videoUrl;a.target='_blank';a.rel='noopener';}else{a.onclick=function(e){e.preventDefault();goAnchor(CFG.videoAnchor);};}})();
+document.getElementById('actVideo').onclick=function(e){e.preventDefault();goAnchor(CFG.videoAnchor);};
 // Кнопка «Видео» временно скрыта (CFG.videoEnabled=false). Разметка/стили/обработчик/якорь остаются в коде —
 // чтобы вернуть, достаточно CFG.videoEnabled=true (и актуальный CFG.videoAnchor на странице Tilda).
 if(!CFG.videoEnabled){var _v=document.getElementById('actVideo'); if(_v) _v.style.display='none';}
