@@ -157,13 +157,14 @@
 // ┌─────────────────────────────────────────────────────────────────────────┐
 // │ АСТРА v4 — УЗКАЯ НИЗКАЯ грядка. Как v3 (узкая, торцы 485, смешанная         │
 // │ модульность, 6 размеров), НО высота 320 мм (грунт 300). Цены/вес — как v1:  │
-// │ модуль 900 (2 секции) = 2300 ₽ / 21 кг; модуль 485 (2 секции) = 1400 ₽ /    │
+// │ модуль 900 (2 секции) = 2580 ₽, беж. 2968 / 21 кг; модуль 485 = 1400 ₽ /    │
 // │ 9.2 кг. Грядка 1 = 2 модуля 485 (квадрат 0.54×0.54); грядки 2–6 = торцы     │
 // │ (1 модуль 485) + (m−1) модулей 900. Длина/грунт — как v3. Репо/Pages —      │
 // │ ОТДЕЛЬНЫЕ (v4). Не мешать с v1/v2/v3!                                        │
 // └─────────────────────────────────────────────────────────────────────────┘
 const CFG={
-  priceModule900: 2300,   // v4: цена модуля 900 мм (2 секции), руб (как v1)
+  priceModule900: 2580,   // v4: цена модуля 900 мм (2 секции), руб (как v1; с 2026-11-02, было 2300)
+  priceModule900Beige: 2968, // бежевый — своя цена из прайса (≈ +15%, но не ровно ×1.15); null → ×beigeMarkup
   priceModule485: 1400,   // v4: цена модуля 485 мм (2 секции), руб (как v1)
   beigeMarkup:    1.15,   // бежевый дороже (1.15 = +15%)
   currency:       ' ₽',
@@ -228,7 +229,7 @@ function spec(m){
     lenInt:sum-CFG.wallGap, widInt:CFG.bedWidth-CFG.wallGap};
 }
 function units(){const k=(color==='beige')?CFG.beigeMarkup:1;
-  return {u900:Math.round(CFG.priceModule900*k), u485:Math.round(CFG.priceModule485*k)};}
+  return {u900:(color==='beige'&&CFG.priceModule900Beige)||Math.round(CFG.priceModule900*k), u485:Math.round(CFG.priceModule485*k)};}
 function order(){
   const sp=spec(N), u=units();
   const price=sp.n900*u.u900 + sp.n485*u.u485;
@@ -273,7 +274,8 @@ function cartProduct(){
   const size=sp.lenExt+'×'+sp.widExt+'×'+CFG.bedHeight+' мм';
   const name='Грядка АСТРА — '+colorName()+', '+size;
   return {
-    uid:'astra4-'+color+'-'+N, id:'astra4-'+color+'-'+N, name:name,
+    // Цена в uid (с 2026-11-02): после смены цены строка по старой цене не обнулится — новая ляжет отдельно.
+    uid:'astra4-'+color+'-'+N+'-'+o.price, id:'astra4-'+color+'-'+N+'-'+o.price, name:name,
     price:o.price, quantity:1, img:cartImgUrl(), url:CFG.productUrl||location.href,
     option:[{option:'Цвет',variant:colorName()},{option:'Размер',variant:size},{option:'Состав',variant:o.breakText}],
     descr:o.breakText,
